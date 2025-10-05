@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DockyCount - YouTube Subscriber Counter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-minimal.css" />
+  <link rel="icon" type="image/png" href="https://cdn.glitch.global/3646dfb4-5cb1-4c3c-9337-1d56b96025d2/Design_sans_titre-removebg-preview%20(1).png?v=1746820022653">
+  <meta name="description" content="Real-time YouTube subscriber counter with beautiful analytics">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7562628849511682" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-7562628849511682">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #8B5CF6;
+      --primary-dark: #7C3AED;
+      --primary-light: #A78BFA;
+      --accent: #06D6A0;
+      --accent-dark: #05B786;
+      --text: #F8FAFC;
+      --text-light: #94A3B8;
+      --bg: #0F0F23;
+      --bg-secondary: #1A1B2F;
+      --card-bg: rgba(26, 27, 47, 0.7);
+      --card-border: rgba(139, 92, 246, 0.15);
+      --success: #10B981;
+      --danger: #EF4444;
+      --border: rgba(255, 255, 255, 0.08);
+      --gradient: linear-gradient(135deg, #8B5CF6 0%, #06D6A0 100%);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 85% 30%, rgba(6, 214, 160, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 50% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 20%);
+    }
+
+    .gradient-text {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .gradient-bg {
+      background: var(--gradient);
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .search-input {
+      background: rgba(15, 15, 35, 0.6);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: all 0.3s ease;
+      font-size: 16px;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+      background: rgba(15, 15, 35, 0.8);
+    }
+
+    .action-btn {
+      background: rgba(15, 15, 35, 0.6);
+      border: 1px solid var(--border);
+      color: var(--text);
+      transition: all 0.3s ease;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .channel-avatar {
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .subscriber-count {
+      font-family: 'Space Grotesk', sans-serif !important;
+      font-weight: 700;
+    }
+
+    .sidebar-favorites {
+      background: rgba(15, 15, 35, 0.9);
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .bg-grid {
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 15, 35, 0.4);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 3px;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      transition: all 0.3s ease;
+      border: none;
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    }
+    
+    .card-content {
+      padding: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar-favorites {
+        display: none;
+      }
+      
+      main.container {
+        margin-left: 0 !important;
+        padding: 0 1rem;
+      }
+
+      .card-content {
+        padding: 1.5rem;
+      }
+    }
+    
+    @media (min-width: 900px) {
+      main.container {
+        margin-left: 280px;
+      }
+    }
+
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    button:focus, input:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    .text-muted {
+      color: var(--text-light);
+    }
+    
+    .loader {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 2px solid var(--primary);
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .toast {
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-weight: 500;
+    }
+    
+    .theme-toggle {
+      cursor: pointer;
+      width: 50px;
+      height: 26px;
+      position: relative;
+    }
+    
+    .theme-toggle .slider {
+      border-radius: 34px;
+      transition: .4s;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+    }
+    
+    .theme-toggle input:checked + .slider {
+      background: var(--primary);
+    }
+    
+    .theme-toggle .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 4px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    .theme-toggle input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .user-avatar:hover {
+      border-color: var(--primary);
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.5rem;
+      min-width: 180px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+    }
+
+    .floating-shapes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(6, 214, 160, 0.1) 100%);
+      animation: float 15s infinite linear;
+    }
+
+    .shape:nth-child(1) {
+      width: 300px;
+      height: 300px;
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+      width: 200px;
+      height: 200px;
+      top: 60%;
+      left: 80%;
+      animation-delay: -5s;
+      animation-duration: 20s;
+    }
+
+    .shape:nth-child(3) {
+      width: 150px;
+      height: 150px;
+      top: 80%;
+      left: 10%;
+      animation-delay: -10s;
+      animation-duration: 25s;
+    }
+
+    .stats-card {
+      background: rgba(26, 27, 47, 0.5);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+      border-color: rgba(139, 92, 246, 0.3);
+      transform: translateY(-3px);
+    }
+
+    .stats-value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stats-label {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-top: 0.5rem;
+    }
+
+    .channel-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .channel-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+    }
+
+    .nav-item {
+      position: relative;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-item:hover {
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .nav-item.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--primary);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 60%;
+      background: var(--primary);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(139, 92, 246, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .feature-icon svg {
+      width: 30px;
+      height: 30px;
+      color: var(--primary);
+    }
+
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.75rem;
+      z-index: 40;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      color: var(--text-light);
+      font-size: 0.75rem;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--primary);
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    .mobile-nav-item svg {
+      width: 20px;
+      height: 20px;
+      margin-bottom: 0.25rem;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .tab-button.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--primary);
+    }
+
+    .compare-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(26, 27, 47, 0.7);
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+    }
+
+    .compare-channel {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .compare-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .compare-vs {
+      font-weight: 700;
+      color: var(--primary);
+      padding: 0 1rem;
+    }
+    
+    /* Styles pour le mode minimal */
+    .minimal-mode {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .minimal-counter {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    
+    .minimal-channel {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .minimal-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .minimal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--text);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .minimal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Floating Background Shapes -->
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar-favorites fixed top-0 left-0 w-80 h-full z-40 p-6 hidden lg:block">
+    <div class="flex flex-col h-full">
+      <!-- Logo -->
+      <div class="mb-8">
+        <div class="text-2xl font-bold gradient-text flex items-center">
+          <img src="https://asset-dockyhost-2.vercel.app/bdd1b455-b433-4f59-8a07-2e0e41d5916c-modified.png" alt="DockyCount Logo" class="h-8 mr-3">
+          DockyCount
+        </div>
+        <p class="text-sm text-gray-400 mt-2">Track YouTube subscribers in real-time</p>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="mb-8">
+        <div class="nav-item active" data-section="dashboard">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          Dashboard
+        </div>
+        <div class="nav-item" data-section="analytics">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          Analytics
+        </div>
+        <div class="nav-item" data-section="compare">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Compare
+        </div>
+        <div class="nav-item" data-section="favorites">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+          Favorites
+        </div>
+      </nav>
+
+      <!-- Favorites Section -->
+      <div class="flex-1">
+        <div class="text-lg font-semibold mb-4 gradient-text">Your Favorite Channels</div>
+        <div class="favorites-list overflow-y-auto max-h-[calc(100vh-320px)]" id="favorites-list">
+          <div class="text-gray-500 text-sm p-4 text-center">Sign in to save favorites</div>
+        </div>
+      </div>
+
+      <!-- User Section -->
+      <div class="pt-4 border-t border-gray-800">
+        <div class="flex items-center justify-between">
+          <div id="auth-container">
+            <button id="sign-in-button" class="btn-primary text-sm px-4 py-2">Sign In</button>
+            <div id="user-profile" class="hidden items-center">
+              <img id="user-avatar" class="user-avatar mr-3" src="" alt="User Avatar">
+              <div>
+                <div id="user-name" class="text-sm font-medium"></div>
+                <button id="sign-out-button" class="text-xs text-gray-400 hover:text-white">Sign Out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav lg:hidden">
+    <div class="mobile-nav-item active" data-section="dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+      Home
+    </div>
+    <div class="mobile-nav-item" data-section="compare">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+      Compare
+    </div>
+    <div class="mobile-nav-item" data-section="favorites">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+      Favorites
+    </div>
+    <div class="mobile-nav-item" data-section="settings">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      Settings
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container max-w-6xl mx-auto px-4 py-6 lg:py-10 flex-grow lg:ml-80">
+    <!-- Header -->
+    <header class="mb-8">
+      <h1 class="text-3xl lg:text-4xl font-bold mb-2 gradient-text">YouTube Subscriber Tracker</h1>
+      <p class="text-lg text-gray-300">Monitor real-time subscriber counts and growth analytics</p>
+    </header>
+
+    <!-- Search Section -->
+    <section class="glass-card mb-8" data-aos="fade-up" id="dashboard-section">
+      <div class="card-content">
+        <div class="flex flex-col gap-5">
+          <div class="flex flex-col md:flex-row gap-4 w-full">
+            <div class="flex-1 relative">
+              <input type="text" class="search-input w-full" id="channel-input" placeholder="Enter YouTube channel name or URL" onkeypress="handleKeyPress(event)">
+              <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+            <button class="btn-primary font-medium min-w-[140px]" onclick="fetchChannelData()">
+              <span id="search-text">Search Channel</span>
+              <div class="loader hidden ml-2" id="loader"></div>
+            </button>
+          </div>
+          <div class="flex justify-center">
+            <button class="text-sm text-gray-400 hover:text-white flex items-center" id="show-compare-search-btn" onclick="showCompareSearchBar()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              Compare channels
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compare Search Section -->
+    <section class="glass-card mb-8 hidden" id="compare-search-section" data-aos="fade-up">
+      <div class="card-content">
+        <div class="flex flex-col gap-6 w-full">
+          <div>
+            <h3 class="text-lg font-semibold mb-4">Compare Channels</h3>
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="text" class="search-input flex-1" id="compare-input-1" placeholder="First channel name or URL">
+              <button class="btn-primary font-medium min-w-[100px]" onclick="fetchCompareSearch(1)">
+                Search
+              </button>
+            </div>
+            <div id="compare-results-1" class="w-full mt-3"></div>
+          </div>
+          
+          <div>
+            <div class="flex flex-col md:flex-row gap-3">
+              <input type="text" class="search-input flex-1" id="compare-input-2" placeholder="Second channel name or URL">
+              <button class="btn-primary font-medium min-w-[100px]" onclick="fetchCompareSearch(2)">
+                Search
+              </button>
+            </div>
+            <div id="compare-results-2" class="w-full mt-3"></div>
+          </div>
+          
+          <div class="flex justify-end gap-3 mt-4">
+            <button class="action-btn" onclick="hideCompareSearchBar()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="glass-card mb-8 hidden" id="results-section" data-aos="fade-up">
+      <div class="card-content">
+        <h2 class="text-xl font-semibold mb-5">Search Results</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="results-grid"></div>
+      </div>
+    </section>
+
+    <!-- Counter Section -->
+    <section class="glass-card mb-8 hidden" id="counter-section" data-aos="fade-up">
+      <div class="card-content">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <div class="flex items-center mb-4 md:mb-0">
+            <img src="" alt="Channel Avatar" class="counter-avatar w-16 h-16 rounded-full mr-4 channel-avatar pulse" id="channel-avatar">
+            <div>
+              <h3 class="channel-title text-xl font-semibold" id="channel-name"></h3>
+              <button class="favorite-star text-2xl mt-1 bg-transparent border-none cursor-pointer text-yellow-400 hover:text-yellow-300 transition-colors" id="favorite-star" title="Add to favorites">
+                &#9734;
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button class="action-btn" onclick="shareChannel()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              Share
+            </button>
+            <button class="action-btn" onclick="toggleChart()" id="toggle-chart-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Chart
+            </button>
+            <button class="action-btn" onclick="addToCompare()" id="compare-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Compare
+            </button>
+          </div>
+        </div>
+
+        <div class="text-center my-8">
+          <div class="subscriber-count text-5xl md:text-6xl font-bold mb-3" id="subscriber-count">0</div>
+          <div class="subscriber-change text-lg font-medium" id="subscriber-change"></div>
+        </div>
+
+        <div class="flex justify-center gap-3 mt-6">
+          <button class="action-btn" onclick="refreshCounter()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+          <button class="action-btn" onclick="activateMinimalMode()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2 2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+            </svg>
+            Minimal
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chart Section -->
+    <section class="glass-card mb-8 hidden" id="chart-section" data-aos="fade-up">
+      <div class="card-content">
+        <h3 class="text-lg font-semibold mb-5">Subscriber Growth</h3>
+        <div class="chart-container h-64">
+          <canvas id="subscriberChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compare Section -->
+    <section class="glass-card mb-8 hidden" id="compare-section" data-aos="fade-up">
+      <div class="card-content">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold">Channel Comparison</h3>
+          <button class="action-btn" onclick="closeCompare()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Close
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" id="compare-channels">
+        </div>
+        <div class="flex justify-center">
+          <button class="action-btn" onclick="refreshCompare()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics Section -->
+    <section class="glass-card mb-8 hidden" id="analytics-section" data-aos="fade-up">
+      <div class="card-content">
+        <h3 class="text-lg font-semibold mb-5">Channel Analytics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="stats-card">
+            <div class="stats-value" id="total-views">0</div>
+            <div class="stats-label">Total Views</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-value" id="total-videos">0</div>
+            <div class="stats-label">Total Videos</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-value" id="subscriber-growth">0%</div>
+            <div class="stats-label">Growth Rate (30d)</div>
+          </div>
+        </div>
+        <div class="chart-container h-64">
+          <canvas id="analyticsChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Favorites Section -->
+    <section class="glass-card mb-8 hidden" id="favorites-section" data-aos="fade-up">
+      <div class="card-content">
+        <h3 class="text-lg font-semibold mb-5">Your Favorite Channels</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="favorites-grid">
+          <div class="text-gray-500 text-center p-4">No favorite channels yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="mb-8" data-aos="fade-up">
+      <h2 class="text-2xl font-bold mb-6 text-center gradient-text">Why Choose DockyCount?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 text-center">
+          <div class="feature-icon mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Real-time Updates</h3>
+          <p class="text-gray-400">Get live subscriber counts updated every few seconds</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="feature-icon mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Channel Comparison</h3>
+          <p class="text-gray-400">Compare multiple channels side by side</p>
+        </div>
+        <div class="glass-card p-6 text-center">
+          <div class="feature-icon mx-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Growth Analytics</h3>
+          <p class="text-gray-400">Track subscriber growth with detailed charts</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Minimal Mode Overlay -->
+  <div class="minimal-mode hidden" id="minimal-mode">
+    <button class="minimal-close" onclick="deactivateMinimalMode()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div class="minimal-channel" id="minimal-channel-name">Channel Name</div>
+    <div class="minimal-counter" id="minimal-subscriber-count">0</div>
+    <div class="minimal-actions">
+      <button class="action-btn" onclick="refreshCounter()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast fixed bottom-6 left-1/2 transform -translate-x-1/2 px-5 py-3 rounded-lg hidden bg-gradient-to-r from-purple-600 to-teal-500 text-white text-sm font-medium shadow-lg" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjmXMMafuPYkYi1GzrnucNJSjxypN2gYQ",
+      authDomain: "docky-dev-fr.firebaseapp.com",
+      projectId: "docky-dev-fr",
+      storageBucket: "docky-dev-fr.firebasestorage.app",
+      messagingSenderId: "548202839817",
+      appId: "1:548202839817:web:832f713ae5135e41809dd8",
+      measurementId: "G-KLXHVFYQYY"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const db = getFirestore(app);
+
+    // Make Firebase available globally
+    window.firebase = {
+      auth,
+      provider,
+      db,
+      signInWithPopup,
+      signOut,
+      onAuthStateChanged,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      arrayUnion,
+      arrayRemove
+    };
+
+    // Signal that Firebase is ready
+    window.firebaseReady = true;
+  </script>
+
+  <script>
+    // Constants
+    const API_BASE_URL = 'https://backend.mixerno.space/api/youtube/estv3/';
+    const SEARCH_API_URL = 'https://mixerno.space/api/youtube-channel-counter/search/';
+    const MAX_DATA_POINTS = 3600;
+    const UPDATE_INTERVAL = 2000;
+    
+    // State management
+    const state = {
+      channelId: null,
+      intervalId: null,
+      odometer: null,
+      subscriberChart: null,
+      analyticsChart: null,
+      historicalData: [],
+      lastSubscriberCount: 0,
+      isDarkTheme: true,
+      compareChannels: [],
+      currentUser: null,
+      userFavorites: [],
+      compareIntervalId: null,
+      isMinimalMode: false
+    };
+    
+    // DOM elements cache
+    const elements = {
+      channelInput: document.getElementById("channel-input"),
+      loader: document.getElementById("loader"),
+      searchText: document.getElementById("search-text"),
+      resultsSection: document.getElementById("results-section"),
+      resultsGrid: document.getElementById("results-grid"),
+      counterSection: document.getElementById("counter-section"),
+      channelAvatar: document.getElementById("channel-avatar"),
+      channelName: document.getElementById("channel-name"),
+      subscriberCount: document.getElementById("subscriber-count"),
+      subscriberChange: document.getElementById("subscriber-change"),
+      toggleChartButton: document.getElementById("toggle-chart-button"),
+      chartSection: document.getElementById("chart-section"),
+      toast: document.getElementById("toast"),
+      themeSwitch: document.getElementById("theme-switch"),
+      body: document.body,
+      compareSection: document.getElementById("compare-section"),
+      compareChannelsContainer: document.getElementById("compare-channels"),
+      authContainer: document.getElementById("auth-container"),
+      signInButton: document.getElementById("sign-in-button"),
+      signOutButton: document.getElementById("sign-out-button"),
+      userProfile: document.getElementById("user-profile"),
+      userAvatar: document.getElementById("user-avatar"),
+      userName: document.getElementById("user-name"),
+      minimalMode: document.getElementById("minimal-mode"),
+      minimalSubscriberCount: document.getElementById("minimal-subscriber-count"),
+      minimalChannelName: document.getElementById("minimal-channel-name"),
+      analyticsSection: document.getElementById("analytics-section"),
+      favoritesSection: document.getElementById("favorites-section"),
+      dashboardSection: document.getElementById("dashboard-section")
+    };
+
+    // Initialize the application
+    function init() {
+      AOS.init({
+        once: true,
+        duration: 600,
+        easing: 'ease-out'
+      });
+      
+      setupEventListeners();
+      checkUrlFragment();
+      renderFavoritesSidebar();
+      updateFavoriteStar();
+      
+      // Apply dark theme by default
+      applyDarkTheme();
+      
+      // Initialize Firebase Auth state listener
+      initAuth();
+      
+      // Setup navigation
+      setupNavigation();
+    }
+    
+    // Setup navigation between sections
+    function setupNavigation() {
+      // Desktop navigation
+      const navItems = document.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const section = item.getAttribute('data-section');
+          showSection(section);
+          
+          // Update active state
+          navItems.forEach(nav => nav.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+      
+      // Mobile navigation
+      const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+      mobileNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const section = item.getAttribute('data-section');
+          showSection(section);
+          
+          // Update active state
+          mobileNavItems.forEach(nav => nav.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+    }
+    
+    // Show specific section
+    function showSection(section) {
+      // Hide all sections
+      const sections = [
+        'dashboard-section',
+        'analytics-section',
+        'compare-section',
+        'favorites-section'
+      ];
+      
+      sections.forEach(sec => {
+        const element = document.getElementById(sec);
+        if (element) element.style.display = 'none';
+      });
+      
+      // Show the selected section
+      const targetSection = document.getElementById(`${section}-section`);
+      if (targetSection) {
+        targetSection.style.display = 'block';
+        
+        // Special handling for favorites section
+        if (section === 'favorites') {
+          renderFavoritesGrid();
+        }
+      }
+    }
+    
+    // Initialize Firebase Authentication
+    function initAuth() {
+      if (!window.firebase) {
+        // Wait for Firebase to be ready
+        const checkFirebase = setInterval(() => {
+          if (window.firebase) {
+            clearInterval(checkFirebase);
+            setupAuthListener();
+          }
+        }, 100);
+      } else {
+        setupAuthListener();
+      }
+    }
+    
+    function setupAuthListener() {
+      window.firebase.onAuthStateChanged(window.firebase.auth, (user) => {
+        if (user) {
+          // User is signed in
+          state.currentUser = user;
+          updateAuthUI(user);
+          loadUserFavorites(user.uid);
+        } else {
+          // User is signed out
+          state.currentUser = null;
+          state.userFavorites = [];
+          updateAuthUI(null);
+          renderFavoritesSidebar();
+          renderFavoritesGrid();
+        }
+      });
+      
+      // Add event listeners for auth buttons
+      elements.signInButton.addEventListener('click', signInWithGoogle);
+      elements.signOutButton.addEventListener('click', signOutUser);
+    }
+    
+    // Sign in with Google
+    async function signInWithGoogle() {
+      try {
+        const result = await window.firebase.signInWithPopup(window.firebase.auth, window.firebase.provider);
+        showToast("Signed in successfully!");
+      } catch (error) {
+        console.error("Error signing in:", error);
+        showToast("Error signing in. Please try again.");
+      }
+    }
+    
+    // Sign out user
+    async function signOutUser() {
+      try {
+        await window.firebase.signOut(window.firebase.auth);
+        showToast("Signed out successfully!");
+      } catch (error) {
+        console.error("Error signing out:", error);
+        showToast("Error signing out. Please try again.");
+      }
+    }
+    
+    // Update authentication UI based on user state
+    function updateAuthUI(user) {
+      if (user) {
+        // User is signed in
+        elements.signInButton.classList.add('hidden');
+        elements.userProfile.classList.remove('hidden');
+        elements.userAvatar.src = user.photoURL || 'https://via.placeholder.com/32';
+        elements.userName.textContent = user.displayName || 'User';
+      } else {
+        // User is signed out
+        elements.signInButton.classList.remove('hidden');
+        elements.userProfile.classList.add('hidden');
+      }
+    }
+    
+    // Load user favorites from Firestore
+    async function loadUserFavorites(userId) {
+      try {
+        const userDocRef = window.firebase.doc(window.firebase.db, 'users', userId);
+        const userDoc = await window.firebase.getDoc(userDocRef);
+        
+        if (userDoc.exists()) {
+          state.userFavorites = userDoc.data().favorites || [];
+        } else {
+          // Create user document if it doesn't exist
+          await window.firebase.setDoc(userDocRef, { favorites: [] });
+          state.userFavorites = [];
+        }
+        
+        renderFavoritesSidebar();
+        renderFavoritesGrid();
+        updateFavoriteStar();
+      } catch (error) {
+        console.error("Error loading user favorites:", error);
+        showToast("Error loading favorites");
+      }
+    }
+    
+    // Save user favorites to Firestore
+    async function saveUserFavorites() {
+      if (!state.currentUser) return;
+      
+      try {
+        const userDocRef = window.firebase.doc(window.firebase.db, 'users', state.currentUser.uid);
+        await window.firebase.updateDoc(userDocRef, {
+          favorites: state.userFavorites
+        });
+      } catch (error) {
+        console.error("Error saving user favorites:", error);
+        showToast("Error saving favorites");
+      }
+    }
+    
+    // Set up event listeners
+    function setupEventListeners() {
+      // Keyboard shortcuts
+      document.addEventListener('keydown', handleKeyboardShortcuts);
+      
+      // Theme toggle
+      elements.themeSwitch.addEventListener('change', toggleTheme);
+      
+      // Favorite star click handler
+      document.getElementById('favorite-star').onclick = function() {
+        if (!state.channelId || !elements.channelName.textContent) return;
+        
+        if (!state.currentUser) {
+          showToast("Please sign in to save favorites");
+          return;
+        }
+        
+        if (isFavorite(state.channelId)) {
+          removeFavorite(state.channelId);
+        } else {
+          addFavorite(
+            state.channelId,
+            elements.channelName.textContent,
+            elements.channelAvatar.src
+          );
+        }
+      };
+
+      // Handle browser navigation (back/forward buttons)
+      window.addEventListener('popstate', handleNavigation);
+    }
+    
+    // Handle navigation events
+    function handleNavigation() {
+      const urlFragment = window.location.hash.slice(1);
+      if (urlFragment && urlFragment !== state.channelId) {
+        resetCounter();
+        state.channelId = urlFragment;
+        startCounter();
+        updateFavoriteStar();
+      } else if (!urlFragment) {
+        resetCounter();
+        updateFavoriteStar();
+      }
+      renderFavoritesSidebar();
+    }
+    
+    // Check URL fragment for channel ID
+    function checkUrlFragment() {
+      const urlFragment = window.location.hash.slice(1);
+      if (urlFragment) {
+        state.channelId = urlFragment;
+        startCounter();
+      }
+    }
+    
+    // Start the counter
+    function startCounter() {
+      elements.counterSection.classList.remove('hidden');
+      
+      if (!state.odometer) {
+        state.odometer = new Odometer({ 
+          el: elements.subscriberCount, 
+          value: 0,
+          format: '(,ddd)',
+          theme: 'minimal'
+        });
+      }
+      
+      fetchStatsData();
+      state.intervalId = setInterval(fetchStatsData, UPDATE_INTERVAL);
+    }
+    
+    // Reset the counter
+    function resetCounter() {
+      clearInterval(state.intervalId);
+      state.intervalId = null;
+      elements.counterSection.classList.add('hidden');
+      elements.chartSection.classList.add('hidden');
+      elements.toggleChartButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Show Chart';
+      state.historicalData = [];
+      document.title = "DockyCount - YouTube Subscriber Counter";
+    }
+    
+    // Refresh counter manually
+    function refreshCounter() {
+      if (state.channelId) {
+        fetchStatsData();
+        showToast("Counter refreshed", 2000);
+      }
+    }
+    
+    // Show toast notification
+    function showToast(message, duration = 3000) {
+      elements.toast.textContent = message;
+      elements.toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        elements.toast.classList.add('hidden');
+      }, duration);
+    }
+    
+    // Handle key press in search input
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        fetchChannelData();
+      }
+    }
+    
+    // Handle keyboard shortcuts
+    function handleKeyboardShortcuts(event) {
+      // Ctrl+Enter to search
+      if (event.ctrlKey && event.key === 'Enter') {
+        fetchChannelData();
+      }
+      // Escape to clear search
+      if (event.key === 'Escape') {
+        elements.channelInput.value = '';
+      }
+    }
+    
+    // Fetch channel data based on search input
+    async function fetchChannelData() {
+      const channelName = elements.channelInput.value.trim();
+      if (!channelName) {
+        showToast("Please enter a channel name");
+        return;
+      }
+
+      elements.loader.classList.remove('hidden');
+      elements.searchText.classList.add('hidden');
+      
+      try {
+        const response = await fetch(`${SEARCH_API_URL}${encodeURIComponent(channelName)}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        elements.loader.classList.add('hidden');
+        elements.searchText.classList.remove('hidden');
+        
+        if (!data.list?.length) {
+          showToast("Channel not found");
+          return;
+        }
+
+        displayChannelResults(data.list);
+      } catch (error) {
+        console.error("Error fetching channel data:", error);
+        elements.loader.classList.add('hidden');
+        elements.searchText.classList.remove('hidden');
+        showToast("Error fetching channel data");
+      }
+    }
+    
+    // Display channel search results
+    function displayChannelResults(channels) {
+      elements.resultsGrid.innerHTML = "";
+      elements.resultsSection.classList.remove('hidden');
+      
+      channels.forEach((channel) => {
+        const channelElement = document.createElement("div");
+        channelElement.className = "glass-card p-4 cursor-pointer transition-all hover:scale-105 channel-card";
+        channelElement.innerHTML = `
+          <img src="${channel[3]}" alt="${channel[0]}" class="channel-avatar w-16 h-16 rounded-full mx-auto mb-3">
+          <div class="channel-name text-center font-medium">${channel[0]}</div>
+        `;
+        
+        channelElement.onclick = () => {
+          const newUrl = `${window.location.origin}${window.location.pathname}#${channel[2]}`;
+          window.history.pushState({}, '', newUrl);
+
+          state.channelId = channel[2];
+          resetCounter();
+          startCounter();
+          elements.resultsSection.classList.add('hidden');
+        };
+        
+        elements.resultsGrid.appendChild(channelElement);
+      });
+    }
+    
+    // Initialize chart
+    function initializeChart() {
+      const ctx = document.getElementById('subscriberChart').getContext('2d');
+      
+      state.subscriberChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Subscribers',
+            data: [],
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 3,
+            tension: 0.1,
+            pointRadius: 0,
+            fill: true
+          }]
+        },
+        options: {
+          animation: false,
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                label: function(context) {
+                  return `${context.parsed.y.toLocaleString()}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              display: false,
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              display: false,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)',
+                drawBorder: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)',
+                callback: function(value) {
+                  if (value >= 1000000) {
+                    return (value / 1000000).toFixed(1) + 'M';
+                  }
+                  if (value >= 1000) {
+                    return (value / 1000).toFixed(1) + 'K';
+                  }
+                  return value;
+                }
+              }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            axis: 'x',
+            intersect: false
+          }
+        }
+      });
+    }
+    
+    // Update chart with new data
+    function updateChart(count) {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      
+      // Add new data point
+      state.historicalData.push({
+        time: timeString,
+        count: count
+      });
+      
+      // Keep only the last MAX_DATA_POINTS
+      if (state.historicalData.length > MAX_DATA_POINTS) {
+        state.historicalData.shift();
+      }
+      
+      // Initialize chart if not already done
+      if (!state.subscriberChart) {
+        initializeChart();
+      }
+      
+      // Update chart data
+      state.subscriberChart.data.labels = state.historicalData.map(data => data.time);
+      state.subscriberChart.data.datasets[0].data = state.historicalData.map(data => data.count);
+      state.subscriberChart.update();
+    }
+    
+    // Fetch stats data for the current channel
+    async function fetchStatsData() {
+      try {
+        const response = await fetch(`${API_BASE_URL}${state.channelId}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data?.items?.length > 0) {
+            const channel = data.items[0];
+            updateChannelInfo(channel);
+            
+            if (channel.statistics && typeof channel.statistics.subscriberCount === "number") {
+              const subscriberCount = channel.statistics.subscriberCount;
+              updateSubscriberCount(subscriberCount);
+              
+              // Calculate and display subscriber change
+              if (state.lastSubscriberCount > 0) {
+                const change = subscriberCount - state.lastSubscriberCount;
+                updateSubscriberChange(change);
+              }
+              
+              state.lastSubscriberCount = subscriberCount;
+              updateChart(subscriberCount);
+              
+              // Update minimal mode if active
+              if (state.isMinimalMode) {
+                elements.minimalSubscriberCount.textContent = subscriberCount.toLocaleString();
+              }
+            }
+          }
+        } else {
+          console.error("Failed to fetch stats data: ", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching stats data:", error);
+      }
+    }
+    
+    // Update subscriber count display
+    function updateSubscriberCount(count) {
+      if (!state.odometer) {
+        state.odometer = new Odometer({ 
+          el: elements.subscriberCount, 
+          value: count,
+          format: '(,ddd)',
+          theme: 'minimal'
+        });
+      } else {
+        state.odometer.update(count);
+      }
+    }
+
+    // Update subscriber change display
+    function updateSubscriberChange(change) {
+      const changeElement = elements.subscriberChange;
+      if (change === 0) {
+        changeElement.innerHTML = "&rarr; No change";
+        changeElement.className = "subscriber-change text-gray-400";
+      } else if (change > 0) {
+        changeElement.innerHTML = `&uarr; +${change.toLocaleString()}`;
+        changeElement.className = "subscriber-change text-green-500";
+      } else {
+        changeElement.innerHTML = `&darr; ${change.toLocaleString()}`;
+        changeElement.className = "subscriber-change text-red-500";
+      }
+    }
+
+    // Apply dark theme
+    function applyDarkTheme() {
+      elements.body.classList.add('dark-mode');
+      if (state.subscriberChart) {
+        state.subscriberChart.data.datasets[0].borderColor = '#8B5CF6';
+        state.subscriberChart.data.datasets[0].backgroundColor = 'rgba(139, 92, 246, 0.1)';
+        state.subscriberChart.update();
+      }
+    }
+
+    // Apply light theme
+    function applyLightTheme() {
+      elements.body.classList.remove('dark-mode');
+      if (state.subscriberChart) {
+        state.subscriberChart.data.datasets[0].borderColor = '#6366f1';
+        state.subscriberChart.data.datasets[0].backgroundColor = 'rgba(99, 102, 241, 0.1)';
+        state.subscriberChart.update();
+      }
+    }
+
+    // Toggle theme function
+    function toggleTheme() {
+      state.isDarkTheme = !state.isDarkTheme;
+      localStorage.setItem('theme', state.isDarkTheme ? 'dark' : 'light');
+      if (state.isDarkTheme) {
+        applyDarkTheme();
+      } else {
+        applyLightTheme();
+      }
+    }
+    
+    // FAVORITES SYSTEM WITH FIREBASE
+    // Add channel to favorites
+    function addFavorite(channelId, name, avatar) {
+      if (!state.currentUser) {
+        showToast("Please sign in to save favorites");
+        return;
+      }
+      
+      if (!state.userFavorites.some(f => f.id === channelId)) {
+        state.userFavorites.push({ id: channelId, name, avatar });
+        saveUserFavorites();
+        showToast("Channel added to favorites!", 1500);
+        updateFavoriteStar();
+        renderFavoritesSidebar();
+        renderFavoritesGrid();
+      }
+    }
+
+    // Remove channel from favorites
+    function removeFavorite(channelId) {
+      state.userFavorites = state.userFavorites.filter(f => f.id !== channelId);
+      saveUserFavorites();
+      showToast("Channel removed from favorites!", 1500);
+      updateFavoriteStar();
+      renderFavoritesSidebar();
+      renderFavoritesGrid();
+    }
+
+    // Check if channel is favorite
+    function isFavorite(channelId) {
+      return state.userFavorites.some(f => f.id === channelId);
+    }
+
+    // Update favorite star UI
+    function updateFavoriteStar() {
+      const star = document.getElementById('favorite-star');
+      if (!state.channelId) {
+        star.classList.add('inactive');
+        star.innerHTML = '&#9734;';
+        star.title = "Add to favorites";
+        return;
+      }
+      if (isFavorite(state.channelId)) {
+        star.classList.remove('inactive');
+        star.innerHTML = '&#9733;';
+        star.title = "Remove from favorites";
+      } else {
+        star.classList.add('inactive');
+        star.innerHTML = '&#9734;';
+        star.title = "Add to favorites";
+      }
+    }
+
+    // Render sidebar favorites
+    function renderFavoritesSidebar() {
+      const list = document.getElementById('favorites-list');
+      list.innerHTML = '';
+      
+      if (!state.currentUser) {
+        list.innerHTML = '<div class="text-gray-500 text-sm p-4 text-center">Sign in to save favorites</div>';
+        return;
+      }
+      
+      if (state.userFavorites.length === 0) {
+        list.innerHTML = '<div class="text-gray-500 text-sm p-4 text-center">No favorite channels yet.</div>';
+        return;
+      }
+      
+      state.userFavorites.forEach(fav => {
+        const item = document.createElement('div');
+        item.className = 'favorite-channel flex items-center p-3 rounded-lg hover:bg-gray-800 cursor-pointer transition-colors mb-2';
+        item.innerHTML = `
+          <img src="${fav.avatar}" class="favorite-avatar w-10 h-10 rounded-full mr-3" alt="${fav.name}">
+          <span class="favorite-name text-sm flex-1 truncate">${fav.name}</span>
+          <button class="favorite-remove text-red-500 bg-transparent border-none cursor-pointer text-lg ml-2" title="Remove">&times;</button>
+        `;
+        // Click to show counter for this channel
+        item.onclick = (e) => {
+          if (e.target.classList.contains('favorite-remove')) return;
+          window.location.hash = '#' + fav.id;
+          handleNavigation();
+        };
+        // Remove favorite
+        item.querySelector('.favorite-remove').onclick = (e) => {
+          e.stopPropagation();
+          removeFavorite(fav.id);
+        };
+        list.appendChild(item);
+      });
+    }
+
+    // Render favorites grid in the favorites section
+    function renderFavoritesGrid() {
+      const grid = document.getElementById('favorites-grid');
+      grid.innerHTML = '';
+      
+      if (!state.currentUser) {
+        grid.innerHTML = '<div class="text-gray-500 text-center p-4">Please sign in to view your favorite channels.</div>';
+        return;
+      }
+      
+      if (state.userFavorites.length === 0) {
+        grid.innerHTML = '<div class="text-gray-500 text-center p-4">No favorite channels yet.</div>';
+        return;
+      }
+      
+      state.userFavorites.forEach(fav => {
+        const channelElement = document.createElement("div");
+        channelElement.className = "glass-card p-4 cursor-pointer transition-all hover:scale-105 channel-card";
+        channelElement.innerHTML = `
+          <img src="${fav.avatar}" alt="${fav.name}" class="channel-avatar w-16 h-16 rounded-full mx-auto mb-3">
+          <div class="channel-name text-center font-medium">${fav.name}</div>
+          <div class="text-center mt-2">
+            <button class="action-btn" onclick="viewFavoriteChannel('${fav.id}')">View Stats</button>
+          </div>
+        `;
+        
+        grid.appendChild(channelElement);
+      });
+    }
+
+    // View favorite channel
+    function viewFavoriteChannel(channelId) {
+      const newUrl = `${window.location.origin}${window.location.pathname}#${channelId}`;
+      window.history.pushState({}, '', newUrl);
+
+      state.channelId = channelId;
+      resetCounter();
+      startCounter();
+      
+      // Switch to dashboard section
+      showSection('dashboard');
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      document.querySelector('.nav-item[data-section="dashboard"]').classList.add('active');
+    }
+
+    // Update channel info
+    function updateChannelInfo(channel) {
+      elements.channelAvatar.src = channel.snippet.thumbnails.default.url;
+      elements.channelName.textContent = channel.snippet.title;
+      elements.minimalChannelName.textContent = channel.snippet.title;
+      document.title = `${channel.snippet.title} - DockyCount`;
+      updateFavoriteStar();
+      renderFavoritesSidebar();
+    }
+
+    // Toggle chart visibility
+    function toggleChart() {
+      if (elements.chartSection.classList.contains('hidden')) {
+        elements.chartSection.classList.remove('hidden');
+        elements.toggleChartButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Hide Chart';
+        if (!state.subscriberChart && state.historicalData.length > 0) {
+          initializeChart();
+          updateChart(state.historicalData[state.historicalData.length - 1].count);
+        }
+      } else {
+        elements.chartSection.classList.add('hidden');
+        elements.toggleChartButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Show Chart';
+      }
+    }
+
+    // Share channel function
+    function shareChannel() {
+      if (!state.channelId) {
+        showToast("No channel selected to share");
+        return;
+      }
+      
+      const shareUrl = `${window.location.origin}${window.location.pathname}#${state.channelId}`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: `${elements.channelName.textContent} - YouTube Subscriber Count`,
+          text: `Check out ${elements.channelName.textContent}'s subscriber count on DockyCount`,
+          url: shareUrl
+        })
+        .catch(console.error);
+      } else {
+        navigator.clipboard.writeText(shareUrl)
+          .then(() => showToast("Link copied to clipboard"))
+          .catch(() => {
+            // Fallback method for copying to clipboard
+            const textArea = document.createElement("textarea");
+            textArea.value = shareUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            showToast("Link copied to clipboard");
+          });
+      }
+    }
+
+    // COMPARE FUNCTIONALITY
+    // Add current channel to compare list
+    function addToCompare() {
+      if (!state.channelId || !elements.channelName.textContent) {
+        showToast("No channel selected to compare");
+        return;
+      }
+
+      const channelInfo = {
+        id: state.channelId,
+        name: elements.channelName.textContent,
+        avatar: elements.channelAvatar.src,
+        count: state.lastSubscriberCount
+      };
+
+      // Check if channel is already in compare list
+      if (state.compareChannels.some(c => c.id === channelInfo.id)) {
+        showToast("Channel already in comparison");
+        return;
+      }
+
+      // Add to compare list
+      state.compareChannels.push(channelInfo);
+      showToast("Channel added to comparison");
+
+      // If we have 2 channels, show the comparison
+      if (state.compareChannels.length === 2) {
+        showCompare();
+      }
+    }
+
+    // Show comparison view
+    function showCompare() {
+      elements.compareSection.classList.remove('hidden');
+      fetchCompareData();
+      startCompareInterval();
+    }
+
+    // Close the comparison view
+    function closeCompare() {
+      elements.compareSection.classList.add('hidden');
+      state.compareChannels = [];
+      stopCompareInterval();
+    }
+
+    // Render comparison between channels
+    function renderCompare(channel1, channel2) {
+      if (!channel1?.count || !channel2?.count) {
+        showToast("Invalid comparison data");
+        return;
+      }
+
+      const difference = channel1.count - channel2.count;
+      let differenceClass = "bg-gray-800 text-gray-300";
+      let differenceText = "Equal subscribers";
+
+      if (difference > 0) {
+        differenceClass = "bg-green-900/20 text-green-400";
+        differenceText = `${Math.abs(difference).toLocaleString()} more than ${channel2.name}`;
+      } else if (difference < 0) {
+        differenceClass = "bg-red-900/20 text-red-400";
+        differenceText = `${Math.abs(difference).toLocaleString()} less than ${channel2.name}`;
+      }
+
+      elements.compareChannelsContainer.innerHTML = `
+        <div class="compare-channel glass-card p-5 text-center">
+          <img src="${channel1.avatar}" alt="${channel1.name}" class="compare-avatar w-16 h-16 rounded-full mx-auto mb-3">
+          <div class="compare-name font-bold mb-2">${channel1.name}</div>
+          <div id="compare-count-1" class="compare-count text-2xl font-bold">${channel1.count.toLocaleString()}</div>
+        </div>
+        <div class="compare-channel glass-card p-5 text-center">
+          <img src="${channel2.avatar}" alt="${channel2.name}" class="compare-avatar w-16 h-16 rounded-full mx-auto mb-3">
+          <div class="compare-name font-bold mb-2">${channel2.name}</div>
+          <div id="compare-count-2" class="compare-count text-2xl font-bold">${channel2.count.toLocaleString()}</div>
+        </div>
+        <div class="col-span-2">
+          <div class="compare-difference ${differenceClass} p-3 rounded-lg text-center text-sm">
+            ${channel1.name} has ${differenceText}
+          </div>
+        </div>
+      `;
+    }
+
+    // Fetch data for comparison
+    async function fetchCompareData() {
+      try {
+        const channel1 = state.compareChannels[0];
+        const channel2 = state.compareChannels[1];
+        
+        if (!channel1?.id || !channel2?.id) {
+          throw new Error("Invalid channel IDs");
+        }
+
+        const [response1, response2] = await Promise.all([
+          fetch(`${API_BASE_URL}${channel1.id}`),
+          fetch(`${API_BASE_URL}${channel2.id}`)
+        ]);
+
+        if (!response1.ok || !response2.ok) {
+          throw new Error("One or both API requests failed");
+        }
+
+        const [data1, data2] = await Promise.all([
+          response1.json(),
+          response2.json()
+        ]);
+
+        if (!data1.items?.[0] || !data2.items?.[0]) {
+          throw new Error("Invalid data received from API");
+        }
+
+        // Update channel counts
+        channel1.count = parseInt(data1.items[0].statistics.subscriberCount) || 0;
+        channel2.count = parseInt(data2.items[0].statistics.subscriberCount) || 0;
+
+        renderCompare(channel1, channel2);
+      } catch (error) {
+        console.error("Error fetching comparison data:", error);
+        showToast("Error fetching comparison data");
+        elements.compareSection.classList.add('hidden');
+      }
+    }
+
+    // Refresh comparison data
+    function refreshCompare() {
+      if (state.compareChannels && state.compareChannels.length === 2) {
+        fetchCompareData();
+        showToast("Comparison refreshed", 2000);
+      } else {
+        showToast("No channels to compare");
+      }
+    }
+
+    // Show compare search bar
+    function showCompareSearchBar() {
+      document.getElementById('compare-search-section').classList.remove('hidden');
+      document.getElementById('dashboard-section').classList.add('hidden');
+      document.getElementById('results-section').classList.add('hidden');
+      document.getElementById('compare-input-1').value = '';
+      document.getElementById('compare-input-2').value = '';
+      document.getElementById('compare-results-1').innerHTML = '';
+      document.getElementById('compare-results-2').innerHTML = '';
+      closeCompare();
+    }
+
+    // Hide compare search bar
+    function hideCompareSearchBar() {
+      document.getElementById('compare-search-section').classList.add('hidden');
+      document.getElementById('dashboard-section').classList.remove('hidden');
+    }
+
+    // Fetch search results for comparison
+    async function fetchCompareSearch(slot) {
+      const inputElement = document.getElementById(`compare-input-${slot}`);
+      const resultsElement = document.getElementById(`compare-results-${slot}`);
+      const channelName = inputElement.value.trim();
+      
+      if (!channelName) {
+        showToast("Please enter a channel name");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${SEARCH_API_URL}${encodeURIComponent(channelName)}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        if (!data.list?.length) {
+          showToast("Channel not found");
+          return;
+        }
+
+        displayCompareResults(data.list, slot, resultsElement);
+      } catch (error) {
+        console.error("Error fetching channel data:", error);
+        showToast("Error fetching channel data");
+      }
+    }
+
+    // Display search results for comparison
+    function displayCompareResults(channels, slot, resultsElement) {
+      resultsElement.innerHTML = "";
+      
+      channels.forEach((channel) => {
+        const channelElement = document.createElement("div");
+        channelElement.className = "glass-card p-3 mb-2 cursor-pointer transition-all hover:scale-105";
+        channelElement.innerHTML = `
+          <div class="flex items-center">
+            <img src="${channel[3]}" alt="${channel[0]}" class="channel-avatar w-10 h-10 rounded-full mr-3">
+            <div class="channel-name text-sm">${channel[0]}</div>
+          </div>
+        `;
+        
+        channelElement.onclick = () => {
+          // Store the selected channel for comparison
+          if (slot === 1) {
+            state.compareChannels[0] = {
+              id: channel[2],
+              name: channel[0],
+              avatar: channel[3],
+              count: 0
+            };
+          } else {
+            state.compareChannels[1] = {
+              id: channel[2],
+              name: channel[0],
+              avatar: channel[3],
+              count: 0
+            };
+          }
+          
+          resultsElement.innerHTML = `
+            <div class="flex items-center p-2 bg-gray-800 rounded-lg">
+              <img src="${channel[3]}" alt="${channel[0]}" class="w-8 h-8 rounded-full mr-2">
+              <span class="text-sm">${channel[0]}</span>
+            </div>
+          `;
+          
+          // If both slots are filled, show the comparison
+          if (state.compareChannels.length === 2 && state.compareChannels[0] && state.compareChannels[1]) {
+            hideCompareSearchBar();
+            showCompare();
+          }
+        };
+        
+        resultsElement.appendChild(channelElement);
+      });
+    }
+
+    // Start compare interval
+    function startCompareInterval() {
+      // Stop existing interval if there is one
+      if (state.compareIntervalId) {
+        clearInterval(state.compareIntervalId);
+      }
+  
+      // Start a new interval for refreshCompare() every 2 seconds
+      state.compareIntervalId = setInterval(function() {
+        if (state.compareChannels && state.compareChannels.length === 2) {
+          refreshCompare();
+        }
+      }, 2000);
+    }
+
+    // Stop compare interval
+    function stopCompareInterval() {
+      if (state.compareIntervalId) {
+        clearInterval(state.compareIntervalId);
+        state.compareIntervalId = null;
+      }
+    }
+
+    // Minimal mode function
+    function activateMinimalMode() {
+      if (!state.channelId) {
+        showToast("No channel selected");
+        return;
+      }
+      
+      state.isMinimalMode = true;
+      elements.minimalMode.classList.remove('hidden');
+      elements.minimalChannelName.textContent = elements.channelName.textContent;
+      elements.minimalSubscriberCount.textContent = state.lastSubscriberCount.toLocaleString();
+      
+      // Hide all other sections
+      document.querySelectorAll('section').forEach(section => {
+        section.style.display = 'none';
+      });
+    }
+
+    // Deactivate minimal mode
+    function deactivateMinimalMode() {
+      state.isMinimalMode = false;
+      elements.minimalMode.classList.add('hidden');
+      
+      // Show dashboard section
+      document.getElementById('dashboard-section').style.display = 'block';
+    }
+
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
