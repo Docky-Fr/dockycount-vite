@@ -1,6 +1,7 @@
 {
-  "name": "plex-fake",
+  "name": "dockycount-vite",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "vite",
